@@ -1,12 +1,20 @@
-echo 'label: dos
-type=8e' | sudo sfdisk --force /dev/sdc
-sudo partprobe
-sudo pvcreate /dev/sdc1
+sudo pvcreate /dev/sdc1 /dev/sdd1
 sudo vgcreate vg_datos /dev/sdc1
+sudo vgcreate vg_temp /dev/sdd1
 sudo lvcreate -L 5M vg_datos -n lv_docker
-sudo lvcreate -L 1G vg_datos -n lv_workareas
+sudo lvcreate -L 1.5G vg_datos -n lv_workareas
+sudo lvcreate -L 512M vg_temp -n lv_swap
 sudo mkfs.ext4 /dev/vg_datos/lv_docker
 sudo mkfs.ext4 /dev/vg_datos/lv_workareas
-sudo mkdir -p /var/lib/docker /work
+sudo mkswap /dev/vg_temp/lv_swap
+sudo mkdir -p /var/lib/docker
+sudo mkdir -p /work
 sudo mount /dev/vg_datos/lv_docker /var/lib/docker
 sudo mount /dev/vg_datos/lv_workareas /work
+sudo swapon /dev/vg_temp/lv_swap
+echo "/dev/vg_datos/lv_docker /var/lib/docker ext4 defaults 0 0" | sudo tee -a /etc/fstab
+echo "/dev/vg_datos/lv_workareas /work ext4 defaults 0 0" | sudo tee -a /etc/fstab
+echo "/dev/vg_temp/lv_swap none swap sw 0 0" | sudo tee -a /etc/fstab
+
+
+
