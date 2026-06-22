@@ -1,3 +1,7 @@
+#!/bin/bash
+echo "type=8e" | sudo sfdisk --force /dev/sdc
+echo "type=8e" | sudo sfdisk --force /dev/sdd
+sudo partprobe
 sudo pvcreate /dev/sdc1 /dev/sdd1
 sudo vgcreate vg_datos /dev/sdc1
 sudo vgcreate vg_temp /dev/sdd1
@@ -15,6 +19,7 @@ sudo swapon /dev/vg_temp/lv_swap
 echo "/dev/vg_datos/lv_docker /var/lib/docker ext4 defaults 0 0" | sudo tee -a /etc/fstab
 echo "/dev/vg_datos/lv_workareas /work ext4 defaults 0 0" | sudo tee -a /etc/fstab
 echo "/dev/vg_temp/lv_swap none swap sw 0 0" | sudo tee -a /etc/fstab
+sudo systemctl restart docker
 
 
 
